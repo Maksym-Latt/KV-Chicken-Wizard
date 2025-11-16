@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,6 +30,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -131,19 +134,19 @@ fun GameScreen(
             when (event) {
                 Lifecycle.Event.ON_START,
                 Lifecycle.Event.ON_RESUME -> {
-                    viewModel.onForeground()           // снять причину BACKGROUND
+                    viewModel.onForeground()
                     if (!isSettingsOpen) {
-                        viewModel.resumeTimer()       // резюмим только если оверлей закрыт
+                        viewModel.resumeTimer()
                     }
                     suppressPauseOverlay = false
                 }
                 Lifecycle.Event.ON_PAUSE,
                 Lifecycle.Event.ON_STOP -> {
-                    viewModel.onBackground()          // поставить причину BACKGROUND
+                    viewModel.onBackground()
                     if (!suppressPauseOverlay) {
-                        isSettingsOpen = true         // показать паузу при сворачивании
+                        isSettingsOpen = true
                     }
-                    // Дополнительно вызывать pauseTimer() НЕ нужно — ON_BACKGROUND уже ставит паузу
+                    // Дополнительно вызывать pauseTimer()
                 }
                 else -> Unit
             }
@@ -192,7 +195,7 @@ fun GameScreen(
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(Dimens.ScreenPadding)
+                .windowInsetsPadding(WindowInsets.displayCutout).padding(bottom = 20.dp)
         ) {
             TopBarEgg(
                 level = ui.currentLevel,
