@@ -8,11 +8,11 @@ plugins {
     kotlin("plugin.serialization")
 }
 android {
-    namespace = "com.korinvail.egglightsaga"
+    namespace = "com.chicken.egglightsaga"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.korinvail.egglightsaga"
+        applicationId = "com.chicken.egglightsaga"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
