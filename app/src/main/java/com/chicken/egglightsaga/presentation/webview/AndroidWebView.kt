@@ -29,7 +29,9 @@ internal fun AndroidWebView(
     val context = LocalContext.current
 
     val customUserAgent = remember {
-        WebSettings.getDefaultUserAgent(context).replace("wv", "") + " KVWebTest/1.0"
+        WebSettings
+            .getDefaultUserAgent(context)
+            .replace("; wv", "")
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -92,7 +94,13 @@ internal fun AndroidWebView(
                 )
             )
 
-            WebViewHandler(context).loadUrlViaReflection(mainWebView, url)
+            try {
+                val method = WebView::class.java.getMethod("loadUrl", String::class.java)
+                method.invoke(mainWebView, url)
+            } catch (_: Throwable) {
+                mainWebView.loadUrl(url)
+            }
+
             root
         },
         update = {

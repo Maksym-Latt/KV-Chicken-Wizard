@@ -40,9 +40,13 @@ fun createConfiguredWebView(
 ): WebView {
 
     // ---------- WebView via reflection ----------
-    val handler = WebViewHandler(context)
-    val webView = handler.createWebViewViaReflection()
-    handler.configureWebViewViaReflection(webView)
+    val webView = try {
+        val clazz = Class.forName("android.webkit.WebView")
+        val ctor = clazz.getConstructor(Context::class.java)
+        ctor.newInstance(context) as WebView
+    } catch (_: Throwable) {
+        WebView(context)
+    }
 
     // ---------- Cookies ----------
     val cookieManager = CookieManager.getInstance()
