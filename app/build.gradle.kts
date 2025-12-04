@@ -97,9 +97,6 @@ dependencies {
     implementation("androidx.paging:paging-runtime:3.2.0")
     implementation("androidx.paging:paging-compose:1.0.0-alpha19")
 
-    // Serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-
     // Test
     testImplementation(libs.junit)
     testImplementation("io.mockk:mockk:1.13.10")
@@ -120,13 +117,17 @@ dependencies {
     // Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
-    // OkHttp (HTTP-клієнт)
+    // Networking (OkHttp — HTTP клиент)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+    // Attribution / device identifiers
     implementation("com.appsflyer:af-android-sdk:6.12.0")
     implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
 
+    // Firebase IDs
     implementation("com.google.firebase:firebase-installations:17.1.0")
+
+    // Play Services (корутины + install referrer)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
     implementation("com.android.installreferrer:installreferrer:2.2")
 
