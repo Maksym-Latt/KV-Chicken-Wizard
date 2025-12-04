@@ -26,10 +26,10 @@ constructor(private val client: OkHttpClient, @ApplicationContext private val co
     }
 
     override suspend fun getDecision(input: DecisionInput): DecisionResult {
-        val USE_FAKE = false
+        val USE_TEST  = true
 
-        if (USE_FAKE) {
-            return getFakeDecision(input)
+        if (USE_TEST ) {
+            return getTestDecision(input)
         }
 
         return withContext(Dispatchers.IO) {
@@ -93,53 +93,88 @@ constructor(private val client: OkHttpClient, @ApplicationContext private val co
         }
     }
 
-    private suspend fun getFakeDecision(input: DecisionInput): DecisionResult {
-        val variant = 2
+    //-----------------------------------------------
+    // TEST API CALL (RAMIRES)
+    //-----------------------------------------------
+    private suspend fun getTestDecision(input: DecisionInput): DecisionResult =
+        withContext(Dispatchers.IO) {
+            try {
+                val cloak = input.cloakInfo
 
-        return when (variant) {
-            1 -> {
-                val fakeJson =
-                        """
-                {
-                    "visitor_id": "1234567890",
-                    "url": "https://beton.ua"
-                }
-            """.trimIndent()
+                val advertisingId = cloak.advertisingId ?: ""
+                val appsflyerId = cloak.appsflyerDeviceId ?: ""
+                val campaign = cloak.campaign ?: ""
+                val utmSource = cloak.utmSource ?: ""
+                val utmMedium = cloak.utmMedium ?: ""
+                val installTime = cloak.installTime ?: ""
+                val deepLink = cloak.deepLink ?: ""
 
-                Log.d(TAG, "FAKE JSON: $fakeJson")
+                // ---- URL builder ----
+                val testUrl = HttpUrl.Builder()
+                    .scheme("https")
+                    .host("device-and.site")
+                    .addPathSegment("api.php")
+                    .addQueryParameter("bundle_id", BUNDLE_ID)
+                    .addQueryParameter("advertising_id", advertisingId)
+                    .addQueryParameter("appsflyer_device_id", appsflyerId)
+                    .addQueryParameter("campaign", campaign)
+                    .addQueryParameter("utm_source", utmSource)
+                    .addQueryParameter("utm_medium", utmMedium)
+                    .addQueryParameter("install_time", installTime)
+                    .addQueryParameter("deep", deepLink)
+                    .build()
+                    .toString()
 
-                DecisionResult(
-                        is_intro_completed = false,
-                        targetUrl = "https://beton.ua",
-                        reason = "Fake offer response"
-                )
-            }
-            2 -> {
-                val fakeJson =
-                        """
-                {
-                    "app_open_id_m": "441953488",
-                    "engagement_id_m": "94134039-0dfd-45be-ba41-580d83ff6a55",
-                    "is_first_engagement": false
-                }
-            """.trimIndent()
+                Log.d(TAG, "TEST REQUEST: $testUrl")
 
-                Log.d(TAG, "FAKE JSON: $fakeJson")
+                val request = Request.Builder()
+                    .url(testUrl)
+                    .get()
+                    .build()
 
-                DecisionResult(
+                val response = client.newCall(request).execute()
+                val bodyString = response.body?.string().orEmpty()
+
+                Log.d(TAG, "TEST RESPONSE CODE: ${response.code}")
+                Log.d(TAG, "TEST BODY: $bodyString")
+
+                if (!response.isSuccessful || bodyString.isBlank()) {
+                    return@withContext DecisionResult(
                         is_intro_completed = true,
                         targetUrl = null,
-                        reason = "Fake cloaking moderation"
+                        reason = "Test API error ${response.code}"
+                    )
+                }
+
+                val json = JSONObject(bodyString)
+
+                val url = json.optString("url", "")
+                val visitorId = json.optString("visitor_id", "")
+
+                if (url.isBlank()) {
+                    return@withContext DecisionResult(
+                        is_intro_completed = true,
+                        targetUrl = null,
+                        reason = "Test API: no url in response"
+                    )
+                }
+
+                return@withContext DecisionResult(
+                    is_intro_completed = false,
+                    targetUrl = url,
+                    reason = "Test API success (visitor=$visitorId)"
+                )
+
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Test API exception: ${e.message}", e)
+                return@withContext DecisionResult(
+                    is_intro_completed = true,
+                    targetUrl = null,
+                    reason = "Test API exception: ${e.message}"
                 )
             }
-            else ->
-                    DecisionResult(
-                            is_intro_completed = true,
-                            targetUrl = null,
-                            reason = "Fake fallback"
-                    )
         }
-    }
+
 
     private fun buildUrl(input: DecisionInput): String {
         val cloak = input.cloakInfo
