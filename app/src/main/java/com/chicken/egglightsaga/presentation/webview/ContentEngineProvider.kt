@@ -29,8 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import java.io.File
 
-// ==================== WebView Factory ====================
-fun createConfiguredWebView(
+fun ContentEngineProvider(
     context: Context,
     userAgent: String,
     popupContainer: FrameLayout,
@@ -38,9 +37,7 @@ fun createConfiguredWebView(
     onPopupClosed: (WebView) -> Unit,
     onFilePicker: (Intent, ValueCallback<Array<Uri>>, Uri?) -> Unit,
 ): WebView {
-
-    // ---------- WebView via reflection ----------
-    val webView = try {
+    val contentView = try {
         val clazz = Class.forName("android.webkit.WebView")
         val ctor = clazz.getConstructor(Context::class.java)
         ctor.newInstance(context) as WebView
@@ -51,11 +48,11 @@ fun createConfiguredWebView(
     // ---------- Cookies ----------
     val cookieManager = CookieManager.getInstance()
     cookieManager.setAcceptCookie(true)
-    cookieManager.setAcceptThirdPartyCookies(webView, true)
+    cookieManager.setAcceptThirdPartyCookies(contentView, true)
     cookieManager.flush()
 
     // ---------- Settings ----------
-    with(webView.settings) {
+    with(contentView.settings) {
         javaScriptEnabled = true
         javaScriptCanOpenWindowsAutomatically = true
         domStorageEnabled = true
@@ -74,8 +71,7 @@ fun createConfiguredWebView(
         userAgentString = userAgent
     }
 
-    // ==================== WebViewClient ====================
-    webView.webViewClient = object : WebViewClient() {
+    contentView.webViewClient = object : WebViewClient() {
 
         override fun shouldOverrideUrlLoading(
             view: WebView?,
@@ -187,15 +183,13 @@ fun createConfiguredWebView(
                 }
             }
 
-
-            // --- 6. Обычные сайты грузим в WebView ---
             return false
         }
     }
 
     // ==================== WebChromeClient ====================
 
-    webView.webChromeClient = object : WebChromeClient() {
+    contentView.webChromeClient = object : WebChromeClient() {
 
         override fun onCreateWindow(
             view: WebView?,
@@ -204,7 +198,7 @@ fun createConfiguredWebView(
             resultMsg: Message?
         ): Boolean {
 
-            val popupWebView = createConfiguredWebView(
+            val popupWebView = ContentEngineProvider(
                 context, userAgent,
                 popupContainer, onPopupCreated,
                 onPopupClosed, onFilePicker,
@@ -294,7 +288,7 @@ fun createConfiguredWebView(
             } else false
         }
     }
-    return webView
+    return contentView
 }
 
 internal const val WEB_PERMISSION_REQUEST_CODE = 1001

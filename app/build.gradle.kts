@@ -128,5 +128,6 @@ dependencies {
 
     implementation("com.google.firebase:firebase-installations:17.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+    implementation("com.android.installreferrer:installreferrer:2.2")
 
 }

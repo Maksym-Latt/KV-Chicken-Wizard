@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.chicken.egglightsaga.presentation.splash.SplashScreen
-import com.chicken.egglightsaga.presentation.webview.WebViewScreen
+import com.chicken.egglightsaga.presentation.webview.ContentScreen
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier) {
@@ -21,7 +21,7 @@ fun AppNavHost(modifier: Modifier = Modifier) {
     ) {
         composable(NavRoutes.SPLASH) { SplashScreen(navController) }
         composable(
-                route = "${NavRoutes.WEBVIEW}?url={url}",
+                route = "${NavRoutes.CONTENT}?url={url}",
                 arguments =
                         listOf(
                                 navArgument("url") {
@@ -29,13 +29,13 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                                     nullable = true
                                 }
                         )
-        ) { WebViewScreen() }
+        ) { ContentScreen() }
         composable(NavRoutes.GAME) { EggApp() }
     }
 }
 
 object NavRoutes {
     const val SPLASH = "splash"
-    const val WEBVIEW = "webview"
+    const val CONTENT = "content"
     const val GAME = "game"
 }

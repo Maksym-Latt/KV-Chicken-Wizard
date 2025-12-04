@@ -28,9 +28,9 @@ fun SplashScreen(navController: NavController, viewModel: SplashViewModel = hilt
                     popUpTo(NavRoutes.SPLASH) { inclusive = true }
                 }
             }
-            is SplashUiState.NavigateToWebView -> {
+            is SplashUiState.NavigateToContent -> {
                 val encodedUrl = Uri.encode(current.url)
-                navController.navigate("${NavRoutes.WEBVIEW}?url=$encodedUrl") {
+                navController.navigate("${NavRoutes.CONTENT}?url=$encodedUrl") {
                     popUpTo(NavRoutes.SPLASH) { inclusive = true }
                 }
             }

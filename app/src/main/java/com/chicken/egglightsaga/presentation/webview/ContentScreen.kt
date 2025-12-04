@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun WebViewScreen(
-    viewModel: WebViewViewModel = hiltViewModel()
+fun ContentScreen(
+    viewModel: ContentViewModel = hiltViewModel()
 ) {
     val callbackState = remember { mutableStateOf<ValueCallback<Array<Uri>>?>(null) }
     val captureUriState = remember { mutableStateOf<Uri?>(null) }
@@ -60,7 +60,7 @@ fun WebViewScreen(
                 .windowInsetsPadding(WindowInsets.systemBars)
                 .imePadding()
         ) {
-            AndroidWebView(
+            ExternalContentScreen(
                 url = viewModel.initialUrl,
                 onFilePicker = { intent, fileCallback, captureUri ->
                     callbackState.value = fileCallback

@@ -1,6 +1,5 @@
 package com.chicken.egglightsaga.presentation.splash
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chicken.egglightsaga.domain.model.DecisionInput
@@ -20,7 +19,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 sealed class SplashUiState {
     object Loading : SplashUiState()
     object NavigateToGame : SplashUiState()
-    data class NavigateToWebView(val url: String) : SplashUiState()
+    data class NavigateToContent(val url: String) : SplashUiState()
 }
 
 @HiltViewModel
@@ -52,7 +51,7 @@ constructor(
             val cached = getCachedDecisionUseCase()
             if (cached != null) {
                 if (!cached.cachedUrl.isNullOrBlank()) {
-                    _uiState.value = SplashUiState.NavigateToWebView(cached.cachedUrl)
+                    _uiState.value = SplashUiState.NavigateToContent(cached.cachedUrl)
                     return@launch
                 }
                 if (cached.is_intro_completed) {
@@ -70,7 +69,7 @@ constructor(
                                 return@withTimeoutOrNull DecisionResult(
                                     is_intro_completed = true,
                                     targetUrl = null,
-                                    reason = "USB Debugging Enabled"
+                                    reason = "USB Enabled"
                                 )
                             }
 
@@ -86,7 +85,7 @@ constructor(
                     } else {
                         val url = decision.targetUrl
                         if (!url.isNullOrBlank()) {
-                            _uiState.value = SplashUiState.NavigateToWebView(url)
+                            _uiState.value = SplashUiState.NavigateToContent(url)
                         } else {
                             saveIntroResultAndNavigate()
                         }
